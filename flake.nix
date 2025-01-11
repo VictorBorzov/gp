@@ -28,7 +28,7 @@
           pkgs.stdenv.mkDerivation {
             name = binName;
             src = self;
-            buildInputs = with pkgs; [ ];
+            buildInputs = with pkgs; [ SDL2 ];
             buildPhase = "make";
             installPhase = ''
               mkdir -p $out/bin
