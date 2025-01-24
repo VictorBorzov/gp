@@ -12,6 +12,31 @@
 #define CELL_WIDTH ((float) SCREEN_WIDTH / BOARD_WIDTH)
 #define CELL_HEIGHT ((float) SCREEN_HEIGHT / BOARD_HEIGHT)
 
+#define AGENT_COUNT 5
+
+typedef enum {
+	DIR_RIGHT = 0,
+	DIR_UP,
+	DIR_LEFT,
+	DIR_DOWN,
+} Dir;
+
+typedef struct {
+	int pos_x, pos_y;
+	Dir dir;
+	int hunger;
+	int health;
+} Agent;
+
+typedef enum {
+	ACTION_NOP = 0,
+	ACTION_STEP,
+	ACTION_EAT,
+	ACTION_ATTACK,
+} Agent_Action;
+
+Agent agents[AGENT_COUNT];
+
 int scc(int code) {
 	if (code < 0) {
 		fprintf(stderr, "ERROR: sdl error: %s\n", SDL_GetError());
@@ -51,6 +76,30 @@ void render_board_grid(SDL_Renderer *renderer) {
 	}
 }
 
+int random_int_range(int low, int high) {
+	return low + rand() % (high - low);
+}
+
+Dir random_dir(void) {
+	return (Dir) random_int_range(0, 4);
+}
+
+Agent random_agent(void) {
+	Agent agent = { 0 };
+	agent.pos_x = random_int_range(0, BOARD_WIDTH);
+	agent.pos_y = random_int_range(0, BOARD_WIDTH);
+	agent.dir = random_dir();
+	agent.hunger = 100;
+	agent.health = 100;
+	return agent;
+}
+
+void init_agents(void) {
+	for (size_t i = 0; i < AGENT_COUNT; ++i) {
+		agents[i] = random_agent();
+	}
+}
+
 int main(int argc, char *argv[]) {
 	scc(SDL_Init(SDL_INIT_VIDEO));
 	SDL_Window *const window = scp(SDL_CreateWindow(
@@ -59,7 +108,9 @@ int main(int argc, char *argv[]) {
 		SCREEN_WIDTH, SCREEN_HEIGHT,
 		SDL_WINDOW_RESIZABLE));
 
-	SDL_Renderer *const renderer = scp(SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED));
+	SDL_Renderer *const renderer = scp(SDL_CreateRenderer(
+						window, -1,
+						SDL_RENDERER_ACCELERATED));
 
 	scc(SDL_RenderSetLogicalSize(renderer, (int) SCREEN_WIDTH, SCREEN_HEIGHT));
 
