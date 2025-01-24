@@ -35,28 +35,14 @@ void *scp(void *ptr) {
 	return ptr;
 }
 
-Uint8 hex_to_dec(char x) {
-	if ('0' <= x && x <= '9') return x - '0';
-	if ('a' <= x && x <= 'f') return x - 'a' + 10;
-	if ('A' <= x && x <= 'F') return x - 'A' + 10;
-	fprintf(stderr, "Incorrect hex character %c\n", x);
-	exit(1);
-}
-
-Uint8 parse_hex_byte(const char *byte_hex) {
-	return hex_to_dec(*byte_hex) * 0x10 + hex_to_dec(*(byte_hex + 1));
-}
-
-void sdl_set_color_hex(SDL_Renderer *renderer, const char *hex) {
-	size_t hex_len = strlen(hex);
-	assert(hex_len == 6);
-
+void sdl_set_color_hex(SDL_Renderer *renderer, Uint32 hex) {
 	scc(SDL_SetRenderDrawColor(
 			renderer,
-			parse_hex_byte(hex),
-			parse_hex_byte(hex + 2),
-			parse_hex_byte(hex + 4),
-			255));
+			(hex >> (3 * 8)) & 0xFF,
+			(hex >> (2 * 8)) & 0xFF,
+			(hex >> (1 * 8)) & 0xFF,
+			(hex >> (0 * 8)) & 0xFF));
+
 }
 
 typedef enum {
