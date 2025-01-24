@@ -1,4 +1,4 @@
-CFLAGS=-Wall -ggdb -std=c11 -pedantic
+CFLAGS=-Wall -Wold-style-definition -ggdb -std=c11 -pedantic
 LIBS=`sdl2-config --cflags --libs`
 
 gp: main.c
