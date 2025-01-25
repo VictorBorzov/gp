@@ -17,7 +17,7 @@
 #define CELL_HEIGHT ((float) SCREEN_HEIGHT / BOARD_HEIGHT)
 
 #define AGENTS_COUNT 5
-
+#define AGENT_PADDING 15.0f
 
 int scc(int code) {
 	if (code < 0) {
@@ -53,6 +53,17 @@ typedef enum {
 	DIR_LEFT,
 	DIR_DOWN,
 } Dir;
+
+float agents_dirs[4][6] = {
+	// DIR_RIGHT
+	{ 0.0, 0.0, 1.0, 0.5, 0.0, 1.0 },
+	// DIR_UP
+	{ 0.0, 1.0, 0.5, 0.0, 1.0, 1.0 },
+	// DIR_LEFT
+	{ 1.0, 0.0, 1.0, 1.0, 0.0, 0.5 },
+	// DIR_DOWN
+	{ 0.0, 0.0, 1.0, 0.0, 0.5, 1.0 },
+};
 
 typedef struct {
 	int pos_x, pos_y;
@@ -112,36 +123,20 @@ Agent random_agent(void) {
 void init_agents(void) {
 	for (size_t i = 0; i < AGENTS_COUNT; ++i) {
 		agents[i] = random_agent();
+		agents[i].dir = i;
 	}
 }
 
 void render_agent(SDL_Renderer *renderer, Agent agent) {
-#define AGENT_PADDING 20
+	float x1 = agents_dirs[agent.dir][0] * (CELL_WIDTH - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH  + AGENT_PADDING;
+	float y1 = agents_dirs[agent.dir][1] * (CELL_HEIGHT- AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
+	float x2 = agents_dirs[agent.dir][2] * (CELL_WIDTH - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH  + AGENT_PADDING;
+	float y2 = agents_dirs[agent.dir][3] * (CELL_HEIGHT- AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
+	float x3 = agents_dirs[agent.dir][4] * (CELL_WIDTH - AGENT_PADDING * 2) + agent.pos_x * CELL_WIDTH  + AGENT_PADDING;
+	float y3 = agents_dirs[agent.dir][5] * (CELL_HEIGHT- AGENT_PADDING * 2) + agent.pos_y * CELL_HEIGHT + AGENT_PADDING;
 
-	filledTrigonColor(
-		renderer,
-		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
-		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING),
-
-		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
-		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
-
-		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
-		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + (CELL_WIDTH - 2 * AGENT_PADDING) * 0.5),
-		AGENT_COLOR);
-
-	aatrigonColor(
-		renderer,
-		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
-		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING),
-
-		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
-		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
-
-		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
-		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + (CELL_WIDTH - 2 * AGENT_PADDING) * 0.5),
-		AGENT_COLOR);
-
+	filledTrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
+	aatrigonColor(renderer, x1, y1, x2, y2, x3, y3, AGENT_COLOR);
 }
 
 void render_all_agents(SDL_Renderer *renderer) {
