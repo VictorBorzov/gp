@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
+#include <SDL2_gfxPrimitives.h>
 
 #include "./style.h"
 
@@ -15,7 +16,8 @@
 #define CELL_WIDTH ((float) SCREEN_WIDTH / BOARD_WIDTH)
 #define CELL_HEIGHT ((float) SCREEN_HEIGHT / BOARD_HEIGHT)
 
-#define AGENT_COUNT 5
+#define AGENTS_COUNT 5
+
 
 int scc(int code) {
 	if (code < 0) {
@@ -66,7 +68,7 @@ typedef enum {
 	ACTION_ATTACK,
 } Agent_Action;
 
-Agent agents[AGENT_COUNT];
+Agent agents[AGENTS_COUNT];
 
 void render_board_grid(SDL_Renderer *renderer) {
 	sdl_set_color_hex(renderer, GRID_COLOR);
@@ -108,28 +110,42 @@ Agent random_agent(void) {
 }
 
 void init_agents(void) {
-	for (size_t i = 0; i < AGENT_COUNT; ++i) {
+	for (size_t i = 0; i < AGENTS_COUNT; ++i) {
 		agents[i] = random_agent();
 	}
 }
 
 void render_agent(SDL_Renderer *renderer, Agent agent) {
-	sdl_set_color_hex(renderer, AGENT_COLOR);
-
 #define AGENT_PADDING 20
 
-	SDL_Rect rect = {
-		(int) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
-		(int) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING),
-		(int) floorf(CELL_WIDTH - 2 * AGENT_PADDING),
-		(int) floorf(CELL_HEIGHT - 2 * AGENT_PADDING),
-	};
+	filledTrigonColor(
+		renderer,
+		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
+		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING),
 
-	scc(SDL_RenderFillRect(renderer, &rect));
+		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
+		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
+
+		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
+		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + (CELL_WIDTH - 2 * AGENT_PADDING) * 0.5),
+		AGENT_COLOR);
+
+	aatrigonColor(
+		renderer,
+		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
+		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING),
+
+		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING),
+		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
+
+		(Sint16) floorf(agent.pos_x * CELL_WIDTH + AGENT_PADDING + CELL_WIDTH - 2 * AGENT_PADDING),
+		(Sint16) floorf(agent.pos_y * CELL_HEIGHT + AGENT_PADDING + (CELL_WIDTH - 2 * AGENT_PADDING) * 0.5),
+		AGENT_COLOR);
+
 }
 
 void render_all_agents(SDL_Renderer *renderer) {
-	for (size_t i = 0; i < AGENT_COUNT; ++i) {
+	for (size_t i = 0; i < AGENTS_COUNT; ++i) {
 		render_agent(renderer, agents[i]);
 	}
 }
